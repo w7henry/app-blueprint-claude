@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2023", "DOM", "DOM.Iterable", "WebWorker.ImportScripts"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "isolatedModules": true,
+    "resolveJsonModule": true,
+    "allowImportingTsExtensions": false,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "types": ["node", "vite/client"],
+    "noEmit": true,
+    "paths": {
+      "virtual:creator": ["./src/types/virtual-creator.d.ts"],
+      "virtual:exercises": ["./src/types/virtual-exercises.d.ts"],
+      "virtual:assets": ["./src/types/virtual-assets.d.ts"]
+    }
+  },
+  "include": ["src", "creators", "content", "server", "scripts/*.ts", "vite.config.ts", "vitest.config.ts"]
+}

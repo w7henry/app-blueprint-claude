@@ -1,59 +1,84 @@
-# Creator Fitness App: Blueprint
+# Glute Era by Ayria: Creator Fitness App
 
-Dieser Ordner beschreibt, **was** die App erreichen muss und **woran** man erkennt, dass ein Teil fertig ist.
-Das **Wie** entscheidest du als KI-Agent selbst. Ausnahme sind Punkte, die als *Muss* markiert sind.
+Landingpage, Quiz, Paywall und Workout-Web-App im Namen einer Creatorin, gebaut nach dem Blueprint in [`blueprint/`](blueprint/README.md).
+Erste Creatorin: **Ayria Rutledge** ([@ayria_rutledge](https://www.tiktok.com/@ayria_rutledge)). Produkt: **Glute Era**, ein glute-fokussiertes Gym-Programm für Einsteigerinnen.
+Warum genau diese Nische: [`docs/CREATOR_RESEARCH.md`](docs/CREATOR_RESEARCH.md).
 
-## So nutzt du diese Dateien
+> **Status: Pitch-fertiger Prototyp.** Der komplette Flow läuft lokal im Demo-Modus.
+> Für einen echten Launch fehlen: Ayrias Zustimmung und Fotos/Videos, deine Betreiberdaten, die Prüfung der Rechtstexte und die Keys für Supabase, Stripe und Resend.
 
-1. Lies vor jeder Aufgabe diese README, `design.md`, `creator-config.md` und die Datei zum aktuellen Teil.
-2. **Muss** ist verbindlich. Wenn ein Muss mit dem bestehenden Code kollidiert, umgeh es nicht still. Melde den Konflikt und schlag eine Lösung vor.
-3. **Freiraum** heißt: Entscheide selbst und begründe die Entscheidung in 1–2 Sätzen im Commit oder in der PR.
-4. **Nicht machen** sind bekannte Fehler, die Conversion oder Vertrauen kosten.
-5. **Fertig wenn** ist die Abnahme. Ein Teil ist erst fertig, wenn alle Punkte erfüllt und getestet sind.
-6. Jede neue Nutzer-Aktion bekommt ein Event (siehe `analytics.md`).
-7. Lieber weniger Features, dafür sauber, als viele halbe.
+## In 2 Minuten starten (Demo-Modus, ohne Keys)
 
-## Das Produkt in einem Satz
-
-Eine Fitness-App im Namen einer Creatorin. Sie verkauft deren Programm, bringt Käuferinnen schnell zum ersten Erfolg und hält sie über sichtbaren Fortschritt und die Nähe zur Creatorin im Abo.
-
-## Zielgruppe
-
-- Frauen, ca. 18–35, folgen der Creatorin auf TikTok oder Instagram.
-- Anfängerin bis leicht fortgeschritten, trainieren im Gym oder zuhause, oft unsicher, was sie tun sollen.
-- Kommen fast immer **mobil** über Link in Bio oder DM, mit wenig Zeit und aus einem Impuls heraus.
-- Die App-Texte sind **Englisch**. Code-Kommentare in beliebiger Sprache.
-
-## Der Funnel
-
-```
-Link in Bio → Landing → Quiz → Plan-Reveal → Paywall → Kauf → Login
-→ erstes Workout → Woche 1 geschafft → Programm geschafft → nächstes Programm / Verlängerung
+```bash
+npm install
+npm run dev              # http://localhost:5173  (Ayria)
+CREATOR_SLUG=nova npm run dev   # zweite, fiktive Demo-Creatorin mit dunklem Theme
 ```
 
-**Nordstern-Metrik:** Anteil der zahlenden Nutzerinnen, die in ihrer ersten Woche mindestens 2 Workouts abschließen.
-Diese Zahl sagt Retention besser voraus als jede andere.
+Ohne Supabase-Variablen läuft alles lokal: Quiz, Plan, simulierter Kauf (es wird nichts abgebucht), Workouts, Fortschritt, Kündigung.
+Oben in der App steht deutlich „Demo mode“.
 
-## Build-Reihenfolge
+**Bilder von Ayria:** Bis ihre eigenen Fotos in `public/creators/ayria/` liegen, lädt die Seite ihr öffentliches TikTok- bzw. Instagram-Profilbild über unavatar.io.
+Mit `npm run assets:fetch ayria` landen die Bilder lokal im Projekt. **Live nur mit ihrer schriftlichen Zustimmung** (siehe Research-Doku).
 
-| # | Datei | Warum an dieser Stelle |
-|---|-------|------------------------|
-| 1 | `analytics.md` | Ohne Messung wird jede spätere Entscheidung geraten |
-| 2 | `creator-config.md` + `design.md` | Fundament: nichts Creator-Spezifisches im Code |
-| 3 | `conversion.md` | Landing, Quiz, Plan-Reveal |
-| 4 | `paywall.md` | Kauf, Abo, Kündigung |
-| 5 | `activation.md` | Vom Kauf zum ersten Workout |
-| 6 | `workout.md` | Das Kernerlebnis |
-| 7 | `retention.md` | Fortschritt, Programme, Creator-Präsenz |
-| – | `legal.md` | Läuft parallel, Pflicht vor jedem Launch |
+## Was drin ist
 
-## Globale Regeln
+| Blueprint-Teil | Umsetzung |
+|---|---|
+| `analytics.md` | `track()` mit Batching, Retry, Once-Keys und PII-Filter. `events`-Tabelle, Funnel-, Aktivierungs-, Woche-1-, Kohorten- und Umsatz-Views, Creator-Monatsreport. Kauf-Events nur serverseitig. [Katalog](docs/EVENTS.md) |
+| `creator-config.md` + `design.md` | Alles Creator-Spezifische in `creators/<slug>/`, validiert beim Build und Serverstart (inkl. WCAG-AA-Kontrast). Design-Tokens aus `brand`. Gemeinsame Übungsbibliothek mit Overrides. Zweite Demo-Creatorin ohne Code-Änderung |
+| `conversion.md` | Landing (Versprechen und CTA above the fold, echte App-Screens, Story, FAQ, Sticky-CTA), Quiz mit 6 Fragen und Zwischen-Screen in ihrer Stimme, E-Mail mit separatem Marketing-Opt-in, deterministischer Plan-Reveal |
+| `paywall.md` | Jahr hervorgehoben (mit Preis pro Monat) und Monat, Trial mit Datum und Betrag, Stripe Checkout (Apple/Google Pay), erst zahlen, dann Account (passwortlos), idempotente Webhooks, Kündigung mit einem Angebot, Kündigungsseite ohne Login, Upgrade aufs Jahresabo |
+| `activation.md` | Welcome der Creatorin, erstes Workout in ≤ 3 Taps, „Schedule it“, Push-Frage mit Kontext und .ics als Alternative, Feier-Screen mit Startwert, Installations-Hinweis erst danach, E-Mails an Tag 0, nach 24 h und an Tag 3 |
+| `workout.md` | Today mit genau einem Haupt-CTA, Player mit großen Steppern, Pausentimer über Zeitstempel, Übung tauschen, Wake Lock, kg/lbs, Double Progression mit sichtbarer Begründung, offline-fähig mit Sync |
+| `retention.md` | Wochen-Streak, Graphen der Hauptübungen, Bestleistungen, Wochenrückblick (App + Mail), Programmende mit Vorher/Nachher und nächstem Programm, 9:16-Teilen-Karte, Erinnerungen (höchstens 1 pro Tag), Nachricht der Creatorin pro Woche |
+| `legal.md` | Impressum, Datenschutz, AGB, Widerruf als **Entwurf** (Banner), Alters- und Widerrufs-Checkbox, Kündigungsbutton, Account-Löschung, Double-Opt-in, keine Drittanbieter-Tracker, selbst gehostete Fonts |
 
-- **Mobile first.** 390 px Breite ist das Hauptlayout. Desktop muss nur ordentlich aussehen.
-- **Nichts hardcoden**, was zur Creatorin gehört: Name, Farben, Texte, Programme und Preise kommen aus der Config.
-- **Keine erfundenen Beweise.** Keine Fake-Testimonials, Fake-Nutzerzahlen, Fake-Countdowns oder Ergebnisgarantien.
-- **Schnell.** Die Landingpage muss auf mobilem Netz sofort benutzbar sein. Keine schweren Libraries für Kleinigkeiten.
-- **Barrierearm.** Kontrast mindestens WCAG AA, Tap-Targets mindestens 44 px, alle Inputs mit Label.
-- **Stack:** Nutze den bestehenden Stack des Projekts (React/Vite, Supabase, Stripe, Backend auf Railway, Resend für E-Mails).
-  Neue Abhängigkeiten nur, wenn sie klar Zeit sparen, mit kurzer Begründung.
-- **Tests:** Geschäftslogik (Progression, Zugriffsrechte, Abo-Status) bekommt Unit-Tests. UI wird auf echtem Gerät geprüft.
+## Projektstruktur
+
+```
+creators/            Config pro Creatorin (ayria = echt, nova = fiktive Demo) + Schema/Validierung
+content/             gemeinsame Übungsbibliothek
+src/                 Frontend (React)
+  pages/             Landing, Quiz, Reveal, Paywall, Legal (Funnel, schnell geladen)
+  app/               alles nach dem Kauf (lazy geladen): Store, Sync, Player, Fortschritt, Einstellungen
+  shared/            reine Logik für Browser und Server: Progression, Zugriffsrechte, Quiz-Mapping, Streak
+server/              Express-API für Railway: Checkout, Webhooks, Login, Mitglieder-Aktionen, Jobs
+supabase/migrations/ Schema, RLS, Analytics-Views
+scripts/             Vite-Plugin, Config-Check, Stripe-Setup, Screenshots, Bilder laden
+tests/               Unit- und Integrationstests (inkl. echter Postgres-Prüfung der Views)
+```
+
+## Befehle
+
+| | |
+|---|---|
+| `npm run dev` | Frontend (Demo-Modus, solange keine Supabase-Keys gesetzt sind) |
+| `npm run dev:server` | Backend lokal (braucht `.env`, siehe `.env.example`) |
+| `npm test` | 93 Tests: Progression, Zugriffsrechte, Streak, Quiz, Config, Billing/Webhooks, API, Jobs, SQL-Views |
+| `npm run typecheck` / `npm run build` | Typecheck und Produktions-Build |
+| `npm run check:config` | alle Creator-Configs validieren |
+| `npm run stripe:setup` | Stripe-Produkte und -Preise aus der Config anlegen |
+| `npm run screens` | echte App-Screens für die Landingpage erzeugen |
+| `npm start` | API und gebautes Frontend ausliefern (Railway) |
+
+## Live gehen
+
+Schritt für Schritt in [`ONBOARD_CREATOR.md`](ONBOARD_CREATOR.md): Supabase, Stripe, Resend, Railway, Cron-Jobs und die Abnahme-Checkliste.
+Begründete Entscheidungen stehen in [`DECISIONS.md`](DECISIONS.md).
+
+## Was geprüft ist, und was noch nicht
+
+| Abnahme aus dem Blueprint | Stand |
+|---|---|
+| Geschäftslogik mit Unit-Tests (Progression inkl. Grenzfälle, Zugriffsrechte, Abo-Status) | ✅ `npm test` |
+| Webhooks idempotent, Kündigung entzieht Zugriff erst am Periodenende | ✅ Integrationstests mit Fakes |
+| Funnel-View zeigt Conversion pro Schritt | ✅ gegen echtes Postgres (PGlite) getestet |
+| Events genau einmal pro Aktion, auch bei Reload/Doppeltipp, kein PII | ✅ automatisierter Browser-Durchlauf |
+| Reload in jedem Quiz-Schritt verliert nichts | ✅ Browser-Durchlauf |
+| Lighthouse Mobile Performance grün | ✅ 100 (Accessibility 100) auf dem Produkt-Build |
+| Zwei sehr verschiedene Creator-Themes ohne Code-Änderung | ✅ Ayria (hell/warm) und Nova (dunkel/kühl) |
+| Pausentimer stimmt nach Reload/Bildschirm aus | ✅ zeitstempelbasiert, im Browser geprüft |
+| Durchlauf bis Paywall < 90 s auf echtem iPhone, Safe Areas, Tastatur | ⏳ auf echtem Gerät prüfen |
+| Testkauf im Stripe-Testmodus inkl. Login-Mail, Trial-Erinnerung, Refund | ⏳ braucht deine Stripe-, Supabase- und Resend-Keys |
+| Offline-Workout synchronisiert ohne Duplikate | ⏳ Logik vorhanden (Client-UUIDs, Upserts), mit echtem Supabase testen |

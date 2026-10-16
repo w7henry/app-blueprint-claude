@@ -1,0 +1,58 @@
+{
+  "name": "creator-fitness-app",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Creator fitness app: landing, quiz, paywall and workout web app. One codebase, one deploy per creator (CREATOR_SLUG).",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "vite",
+    "dev:server": "tsx watch server/index.ts",
+    "build": "tsc -p tsconfig.json --noEmit && vite build",
+    "preview": "vite preview",
+    "start:server": "tsx server/index.ts",
+    "job:daily": "tsx server/jobs/run.ts daily",
+    "job:weekly": "tsx server/jobs/run.ts weekly",
+    "check:config": "tsx scripts/check-config.ts",
+    "stripe:setup": "tsx scripts/stripe-setup.ts",
+    "assets:fetch": "tsx scripts/fetch-creator-assets.mjs",
+    "screens": "node scripts/screenshots.mjs",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "job:hourly": "tsx server/jobs/run.ts hourly",
+    "start": "tsx server/index.ts",
+    "format": "prettier --write ."
+  },
+  "dependencies": {
+    "@fontsource-variable/dm-sans": "^5.3.0",
+    "@fontsource-variable/inter": "^5.3.0",
+    "@fontsource/instrument-serif": "^5.3.0",
+    "@fontsource/unbounded": "^5.3.0",
+    "@supabase/supabase-js": "^2.118.0",
+    "express": "^5.3.0",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "resend": "^6.34.1",
+    "stripe": "^23.0.0",
+    "tsx": "^4.23.15",
+    "web-push": "^3.6.7",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "^0.5.10",
+    "@types/express": "^5.0.6",
+    "@types/node": "^22.20.5",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@types/web-push": "^3.6.4",
+    "@vitejs/plugin-react": "^6.1.2",
+    "playwright-core": "^1.64.1",
+    "prettier": "^3.9.10",
+    "typescript": "^5.9.3",
+    "vite": "^8.3.4",
+    "vitest": "^5.0.5"
+  }
+}
