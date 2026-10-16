@@ -3,8 +3,11 @@ import { defineConfig } from 'vite';
 import { creatorPlugin } from './scripts/vite-creator-plugin';
 
 // One codebase, one deploy per creator: CREATOR_SLUG=ayria npm run build
+// PREVIEW_FILE=1 builds everything into one self-contained HTML file (npm run preview:file).
+const singleFile = process.env.PREVIEW_FILE === '1';
+
 export default defineConfig({
-  plugins: [creatorPlugin(), react()],
+  plugins: [creatorPlugin({ singleFile }), react()],
   server: {
     port: 5173,
     proxy: {
@@ -12,8 +15,18 @@ export default defineConfig({
       '/api': 'http://localhost:8787',
     },
   },
-  build: {
-    target: 'es2020',
-    sourcemap: false,
-  },
+  build: singleFile
+    ? {
+        target: 'es2020',
+        outDir: 'dist-preview',
+        assetsInlineLimit: () => true,
+        cssCodeSplit: false,
+        modulePreload: false,
+        chunkSizeWarningLimit: 5000,
+        rolldownOptions: { output: { codeSplitting: false } },
+      }
+    : {
+        target: 'es2020',
+        sourcemap: false,
+      },
 });

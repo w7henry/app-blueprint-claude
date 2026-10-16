@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type FormEvent } from 'react';
+import { useEffect, useRef, useState, type SyntheticEvent } from 'react';
 import { CreatorImage } from '../components/CreatorImage';
 import { BackButton, Button, ProgressBar } from '../components/ui';
 import creator from '../creator';
@@ -115,7 +115,9 @@ function EmailScreen() {
   const [busy, setBusy] = useState(false);
   const copy = creator.copy.quiz.email;
 
-  const submit = async (e: FormEvent) => {
+  // Runs from the button click (Enter in the field clicks it too), so it also works
+  // where native form submission is blocked, e.g. sandboxed previews.
+  const submit = async (e: SyntheticEvent) => {
     e.preventDefault();
     const value = email.trim().toLowerCase();
     if (!EMAIL_RE.test(value)) {
@@ -182,7 +184,7 @@ function EmailScreen() {
         <p id="email-note" className="muted small">
           {copy.privacyNote} <Link to="/legal/privacy">Privacy policy</Link>
         </p>
-        <Button type="submit" block busy={busy} className="btn-lg">
+        <Button type="submit" onClick={submit} block busy={busy} className="btn-lg">
           {copy.button}
         </Button>
       </form>

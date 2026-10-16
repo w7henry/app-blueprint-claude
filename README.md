@@ -60,6 +60,7 @@ tests/               Unit- und Integrationstests (inkl. echter Postgres-Prüfung
 | `npm run check:config` | alle Creator-Configs validieren |
 | `npm run stripe:setup` | Stripe-Produkte und -Preise aus der Config anlegen |
 | `npm run screens` | echte App-Screens für die Landingpage erzeugen |
+| `npm run preview:file` | die ganze App (Demo-Modus) als **eine** HTML-Datei → `dist-preview/<slug>-preview.html`, öffnet ohne Server (z. B. in der Vorschau der Claude-App) |
 | `npm start` | API und gebautes Frontend ausliefern (Railway) |
 
 ## Live gehen

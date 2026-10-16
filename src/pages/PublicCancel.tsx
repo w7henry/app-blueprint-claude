@@ -1,7 +1,7 @@
 // Public cancellation page (§ 312k BGB "Kündigungsbutton"): reachable without
 // logging in, from the footer and the terms. Cancels at the end of the paid period.
 
-import { useState, type FormEvent } from 'react';
+import { useState, type SyntheticEvent } from 'react';
 import { BackButton, Button } from '../components/ui';
 import creator from '../creator';
 import { api } from '../lib/api';
@@ -12,7 +12,9 @@ export default function PublicCancel() {
   const [email, setEmail] = useState('');
   const [state, setState] = useState<'idle' | 'busy' | 'done' | 'error'>('idle');
 
-  const submit = async (e: FormEvent) => {
+  // Runs from the button click (Enter in the field clicks it too), so it also works
+  // where native form submission is blocked, e.g. sandboxed previews.
+  const submit = async (e: SyntheticEvent) => {
     e.preventDefault();
     if (!email.includes('@')) return;
     setState('busy');
@@ -54,7 +56,7 @@ export default function PublicCancel() {
               Something went wrong. Please try again or email {creator.identity.supportEmail}.
             </p>
           ) : null}
-          <Button type="submit" block busy={state === 'busy'}>
+          <Button type="submit" onClick={submit} block busy={state === 'busy'}>
             Cancel now
           </Button>
         </form>

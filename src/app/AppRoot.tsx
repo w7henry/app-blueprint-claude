@@ -29,7 +29,7 @@ import './installPrompt';
 import { pullAll, syncNow, wireSync } from './sync';
 
 function registerServiceWorker() {
-  if (import.meta.env.PROD && 'serviceWorker' in navigator) {
+  if (import.meta.env.PROD && import.meta.env.VITE_ROUTER !== 'memory' && 'serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js').catch(() => undefined);
   }
 }

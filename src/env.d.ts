@@ -8,4 +8,6 @@ interface ImportMetaEnv {
   readonly VITE_SUPABASE_ANON_KEY?: string;
   /** Web push public key (VAPID). Optional. */
   readonly VITE_VAPID_PUBLIC_KEY?: string;
+  /** 'memory' for the single-file preview build (route kept in memory, not in the URL). */
+  readonly VITE_ROUTER?: string;
 }

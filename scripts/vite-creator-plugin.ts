@@ -113,8 +113,10 @@ self.addEventListener('notificationclick', (e) => {
 `;
 }
 
-export function creatorPlugin(): Plugin {
+export function creatorPlugin(opts: { singleFile?: boolean } = {}): Plugin {
   const slug = process.env.CREATOR_SLUG || DEFAULT_CREATOR;
+  // Single-file preview (scripts/build-preview.mjs): images inline, no manifest / service worker.
+  const singleFile = !!opts.singleFile;
   let creator: CreatorConfig;
   let exercises: unknown;
   let publicDir = path.resolve('public');
@@ -158,7 +160,9 @@ export function creatorPlugin(): Plugin {
         const screens = Object.fromEntries(
           SCREENS.map((s) => {
             const rel = `/creators/${slug}/screens/${s}.jpg`;
-            return [s, fs.existsSync(path.join(publicDir, rel)) ? rel : null];
+            const file = path.join(publicDir, rel);
+            if (!fs.existsSync(file)) return [s, null];
+            return [s, singleFile ? `data:image/jpeg;base64,${fs.readFileSync(file).toString('base64')}` : rel];
           }),
         );
         return `export default ${JSON.stringify({ screens })};`;
@@ -186,8 +190,18 @@ export function creatorPlugin(): Plugin {
         { tag: 'meta', attrs: { property: 'og:type', content: 'website' }, injectTo: 'head' as const },
         { tag: 'meta', attrs: { name: 'apple-mobile-web-app-capable', content: 'yes' }, injectTo: 'head' as const },
         { tag: 'meta', attrs: { name: 'apple-mobile-web-app-title', content: c.identity.appName }, injectTo: 'head' as const },
-        { tag: 'link', attrs: { rel: 'manifest', href: '/manifest.webmanifest' }, injectTo: 'head' as const },
-        { tag: 'link', attrs: { rel: 'icon', href: '/icon.svg', type: 'image/svg+xml' }, injectTo: 'head' as const },
+        ...(singleFile
+          ? [
+              {
+                tag: 'link',
+                attrs: { rel: 'icon', href: `data:image/svg+xml,${encodeURIComponent(iconSvg(c))}`, type: 'image/svg+xml' },
+                injectTo: 'head' as const,
+              },
+            ]
+          : [
+              { tag: 'link', attrs: { rel: 'manifest', href: '/manifest.webmanifest' }, injectTo: 'head' as const },
+              { tag: 'link', attrs: { rel: 'icon', href: '/icon.svg', type: 'image/svg+xml' }, injectTo: 'head' as const },
+            ]),
         { tag: 'style', attrs: { id: 'theme' }, children: themeCss(c.brand), injectTo: 'head-prepend' as const },
         ...remoteOrigins.map((href) => ({ tag: 'link', attrs: { rel: 'preconnect', href }, injectTo: 'head' as const })),
         ...(hero ? [{ tag: 'link', attrs: { rel: 'preload', as: 'image', href: hero, fetchpriority: 'high' }, injectTo: 'head' as const }] : []),
@@ -213,6 +227,7 @@ export function creatorPlugin(): Plugin {
     },
 
     generateBundle(_, bundle) {
+      if (singleFile) return;
       this.emitFile({ type: 'asset', fileName: 'manifest.webmanifest', source: manifest(creator) });
       this.emitFile({ type: 'asset', fileName: 'icon.svg', source: iconSvg(creator) });
       const precache = Object.keys(bundle)

@@ -1,6 +1,6 @@
 // Passwordless login. The link in the email points to /login/callback?token_hash=…
 
-import { useEffect, useRef, useState, type FormEvent } from 'react';
+import { useEffect, useRef, useState, type SyntheticEvent } from 'react';
 import { BackButton, Button, Screen, Spinner } from '../../components/ui';
 import creator from '../../creator';
 import { track } from '../../lib/analytics';
@@ -19,7 +19,9 @@ export default function Login() {
     if (auth.status === 'signed-in') navigate('/app', { replace: true });
   }, [auth.status]);
 
-  const submit = async (e: FormEvent) => {
+  // Runs from the button click (Enter in the field clicks it too), so it also works
+  // where native form submission is blocked, e.g. sandboxed previews.
+  const submit = async (e: SyntheticEvent) => {
     e.preventDefault();
     if (!email.includes('@')) return;
     setState('busy');
@@ -62,7 +64,7 @@ export default function Login() {
               That didn’t work. Please try again.
             </p>
           ) : null}
-          <Button type="submit" block busy={state === 'busy'}>
+          <Button type="submit" onClick={submit} block busy={state === 'busy'}>
             Email me a login link
           </Button>
         </form>

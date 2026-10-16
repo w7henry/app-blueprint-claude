@@ -24,7 +24,8 @@
     "test:watch": "vitest",
     "job:hourly": "tsx server/jobs/run.ts hourly",
     "start": "tsx server/index.ts",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "preview:file": "node scripts/build-preview.mjs"
   },
   "dependencies": {
     "@fontsource-variable/dm-sans": "^5.3.0",
